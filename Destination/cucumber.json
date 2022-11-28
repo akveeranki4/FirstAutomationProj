@@ -1,0 +1,118 @@
+[
+  {
+    "line": 1,
+    "elements": [
+      {
+        "before": [
+          {
+            "result": {
+              "duration": 6415711100,
+              "status": "passed"
+            },
+            "match": {
+              "location": "stepdefinition.before(Scenario)"
+            }
+          }
+        ],
+        "line": 11,
+        "name": "sample test",
+        "description": "",
+        "id": "sample;sample-test;;2",
+        "after": [
+          {
+            "result": {
+              "duration": 2523179800,
+              "status": "passed"
+            },
+            "match": {
+              "location": "stepdefinition.afterScenario(Scenario)"
+            }
+          }
+        ],
+        "type": "scenario",
+        "keyword": "Scenario Outline",
+        "steps": [
+          {
+            "result": {
+              "duration": 34337912000,
+              "status": "passed"
+            },
+            "line": 5,
+            "name": "login to the application with data (https://www.unionbankonline.co.in/,58051530,Akveer@nki4)...Login:openURLAndEnterloginDetailsAndSubmit",
+            "match": {
+              "arguments": [
+                {
+                  "val": "login to the application with data",
+                  "offset": 0
+                },
+                {
+                  "val": "https://www.unionbankonline.co.in/,58051530,Akveer@nki4",
+                  "offset": 36
+                },
+                {
+                  "val": "",
+                  "offset": 92
+                },
+                {
+                  "val": "...Login:openURLAndEnterloginDetailsAndSubmit",
+                  "offset": 92
+                }
+              ],
+              "location": "stepdefinition.execute(String,String,String,String)"
+            },
+            "matchedColumns": [
+              0,
+              1,
+              2
+            ],
+            "keyword": "Given "
+          },
+          {
+            "result": {
+              "duration": 37408973700,
+              "status": "passed"
+            },
+            "line": 6,
+            "name": "get balance value for the acct with data (035610100156184)...HomePage:openAcctSummaryAndGetBal",
+            "match": {
+              "arguments": [
+                {
+                  "val": "get balance value for the acct with data",
+                  "offset": 0
+                },
+                {
+                  "val": "035610100156184",
+                  "offset": 42
+                },
+                {
+                  "val": "",
+                  "offset": 58
+                },
+                {
+                  "val": "...HomePage:openAcctSummaryAndGetBal",
+                  "offset": 58
+                }
+              ],
+              "location": "stepdefinition.execute(String,String,String,String)"
+            },
+            "matchedColumns": [
+              3
+            ],
+            "keyword": "And "
+          }
+        ],
+        "tags": [
+          {
+            "line": 3,
+            "name": "@Test"
+          }
+        ]
+      }
+    ],
+    "name": "Sample",
+    "description": "",
+    "id": "sample",
+    "keyword": "Feature",
+    "uri": "Sample.feature"
+  }
+]

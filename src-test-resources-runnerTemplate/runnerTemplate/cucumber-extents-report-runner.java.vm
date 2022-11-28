@@ -1,0 +1,219 @@
+#parse("/array.java.vm")
+#if ($packageName)
+package $packageName;
+
+#end##
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import config.configuration;
+
+import automationLib.Driver;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+
+import cucumber.api.CucumberOptions;
+import cucumber.api.junit.Cucumber;
+
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
+import extentmanager.ExtentManager;
+
+@RunWith(Cucumber.class)
+@CucumberOptions(
+        strict = $strict,
+        features = {"$featureFile"},
+        plugin = #stringArray($plugins),
+        monochrome = $monochrome,
+		#if(!$featureFile.contains(".feature:") && $tags)
+		        tags = #stringArray($tags),
+		#end
+        glue = #stringArray($glue))
+        
+public class $className {
+
+	
+	static Logger log = Logger.getLogger("$className");	
+	private static Logger rootLogger;
+	private static String cName;
+	
+	static Date date = new Date();
+	
+	//public String cName = this.getClass().getName().toString(); 
+	public static String fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(date);
+	public static String testExecutionRecords = "C:\\SolutionCentralEngine\\ExtentReports\\" + fileName + "\\";
+	public static String logName = testExecutionRecords + "Log" + "\\" + fileName + ".log";
+	public static File reportName = new File(testExecutionRecords + "DetailedReport" + "\\" + fileName + ".html");
+	
+	@BeforeClass
+	public static void setUp() {
+		
+		cName = "$className";
+		
+		Integer startPos = cName.indexOf("_") + 1;
+		Integer endPos = cName.indexOf("_", startPos);
+		
+		cName = String.valueOf(Integer.valueOf(cName.substring(startPos, endPos)));
+		initializeConsoleLog();
+	
+		log.info("@BeforeClass STARTED");
+
+		if (System.getProperty("TEST_EXECUTION_REPORT") != null && !System.getProperty("TEST_EXECUTION_REPORT").isEmpty() && System.getProperty("TEST_EXECUTION_REPORT").trim().length() > 0) {
+
+			log.info("Environment Variable TEST_EXECUTION_REPORT is set.");
+
+			fileName = System.getProperty("TEST_EXECUTION_REPORT");				
+			testExecutionRecords = "TestExecutionRecords" + System.getProperty("file.separator") + fileName + System.getProperty("file.separator");
+
+			reportName = new File(testExecutionRecords + "DetailedReport" + System.getProperty("file.separator") + cName + ".html");
+			logName = testExecutionRecords + "Log" + System.getProperty("file.separator") + cName + ".log";
+			//reportName = new File(testExecutionRecords + "DetailedReport" + System.getProperty("file.separator") +  + ".html");
+
+		}
+		
+		log.info("Creating Directories...");
+		createDirectories();
+			
+		log.info("@BeforeClass STARTED");
+
+		log.info("Directories Created.");
+
+		log.info("#SCENARIOSTATUS# - Runner ID : " + cName);
+
+		log.info("#SCENARIOSTATUS# - Feature File : " + "$featureFile");
+		
+		configuration.setFeatureFileName("$featureFile");
+		
+		log.info("Report Name : " + reportName.getAbsolutePath());
+		
+		//@SuppressWarnings({ "unused", "resource" })
+		//ExtentCucumberFormatter ecf = new ExtentCucumberFormatter(reportName);
+		
+		//ExtentProperties extentProperties = ExtentProperties.INSTANCE;
+		//extentProperties.setReportPath("output/myreport.html");
+		ExtentManager.createInstance(reportName.getAbsolutePath());
+		
+		log.info("@BeforeClass is COMPLETED");
+		
+	}
+	
+	
+	@AfterClass
+	public static void teardown() throws IOException {
+		
+		log.info("@AfterClass STARTED");
+		
+		//Reporter.loadXMLConfig(new File("src/test/java/extent-config2.xml"));
+		//Reporter.setSystemInfo("os","Windows");
+				
+		//log.info("After all the scenarios are completed");
+		//Driver.quit();
+		
+		/*try {
+			Runtime.getRuntime().exec("taskkill /F /IM chromedriver.exe");
+			Runtime.getRuntime().exec("taskkill /F /IM IEDriverServer.exe");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
+		
+		Driver.quit();
+		
+		if (System.getProperty("TEST_EXECUTION_REPORT") == null || System.getProperty("TEST_EXECUTION_REPORT").isEmpty() || System.getProperty("TEST_EXECUTION_REPORT").trim().length() == 0) {
+			
+			log.info("Copying Screenshots");
+			
+			String srcDir = "C:\\SolutionCentralEngine\\Screenshots";
+			String destDir = "C:\\SolutionCentralEngine\\ExtentReports\\" + fileName + "\\Screenshots";
+			
+			try {
+				Files.move(new File(srcDir).toPath(), new File(destDir).toPath(), StandardCopyOption.REPLACE_EXISTING);
+				log.info("Screenshots Copied");
+			} catch (Exception ex) {
+				log.info("Copy Screenshots Exception" + System.lineSeparator() + ex.toString());
+			}
+			
+		}
+		
+		log.info("@AfterClass COMPLETED");
+	}
+	
+	private static void createDirectories() {
+		
+		log.info("Test Execution Records = '" + testExecutionRecords + "'");
+		
+		log.info("Creating directory for Test Execution Records...");
+		
+		String detailedReport = testExecutionRecords + "DetailedReport";
+		String summaryReport = testExecutionRecords + "SummaryReport";
+		String jsonFolder = testExecutionRecords + "JSON"; 
+		String screenshotsFolder = testExecutionRecords + "Screenshots";
+		String logFolder = testExecutionRecords + "Log";
+		String graph = testExecutionRecords + "Graph";
+
+		new File (detailedReport).mkdirs();
+		new File (summaryReport).mkdirs();
+		new File (jsonFolder).mkdirs();
+		new File (screenshotsFolder).mkdirs();
+		new File (logFolder).mkdirs();
+		new File (graph).mkdirs();
+		
+		initializeLog();
+		
+		config.configuration.setScreentshotsFolder(screenshotsFolder);
+		
+		log.info("Detailed Report = " + detailedReport);
+		log.info("Summary Report = " + summaryReport);
+		log.info("JSON Folder = " + jsonFolder);
+		log.info("Screenshots = " + screenshotsFolder);
+		log.info("Log Folder = " + logFolder);
+		log.info("Graph = " + graph);
+		
+		
+		log.info("Directory for Test Execution Records is created.");		
+		log.info("Test Execution Report Name : " + reportName);
+		
+	} // --- createDirectories
+	
+	private static void initializeLog() {
+
+		PatternLayout fileLayout = new PatternLayout("[SCENARIO#" + cName + "]~" + " %d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L %C.%M - %m%n");
+		
+		FileAppender fileAppender = new FileAppender();
+		fileAppender.setLayout(fileLayout);
+		fileAppender.setFile(logName);
+		fileAppender.activateOptions();
+		rootLogger.addAppender(fileAppender);
+		
+	} // --- initializeLog
+	
+	private static void initializeConsoleLog() {
+		
+		rootLogger = Logger.getRootLogger();
+		rootLogger.setLevel(Level.INFO);
+		
+		PatternLayout consoleLayout = new PatternLayout("[SCENARIO#" + cName + "]" + " %d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L %C.%M - %m%n");
+
+		ConsoleAppender consoleAppender = new ConsoleAppender();
+		consoleAppender.setLayout(consoleLayout);
+		consoleAppender.setTarget(ConsoleAppender.SYSTEM_OUT);
+		consoleAppender.activateOptions();
+		rootLogger.addAppender(consoleAppender);
+		
+	}	
+	
+}
+
+
+
+
+
